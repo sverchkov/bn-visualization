@@ -6,6 +6,8 @@ package edu.pitt.isp.sverchkov.bnvis;
 
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
+import java.util.List;
 import processing.core.PApplet;
 
 /**
@@ -19,6 +21,8 @@ public class MainPApplet extends PApplet {
     
     private float zoom = 1; // Proportional
     private float xpiv = 0, ypiv = 0;
+    
+    private final List<ProcessingDrawable> drawables = new ArrayList<>();
         
     private final MouseWheelListener mouseWheel = new MouseWheelListener(){
         @Override
@@ -36,7 +40,7 @@ public class MainPApplet extends PApplet {
         xpiv -= xOffset/zoom;
         ypiv -= yOffset/zoom;
 
-        if (mousePressed == true) {
+        if (mousePressed) {
             xpiv = xpiv + (xOffset/zoom);
             ypiv = ypiv + (yOffset/zoom);
         }
@@ -67,7 +71,8 @@ public class MainPApplet extends PApplet {
         transscale();
         
         // Objects are drawn
-        rect(100,100,400,400);
+        for( ProcessingDrawable d : drawables )
+            d.draw();
         
         // Undo coordinate matrix transformation
         // popMatrix();
@@ -75,4 +80,8 @@ public class MainPApplet extends PApplet {
         // Hud-like elements go here
     }
     
+    public void addDrawable( ProcessingDrawable d ){
+        d.setParentApplet(this);
+        drawables.add(d);
+    }
 }

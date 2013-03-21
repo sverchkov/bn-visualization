@@ -18,6 +18,8 @@ public class BNVisualization {
      */
     public static void main(String[] args) {
         
+        // Set up JFrame
+        
         JFrame frame = new JFrame("BNVis v.000");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         MainPApplet applet = new MainPApplet();
@@ -25,5 +27,10 @@ public class BNVisualization {
         applet.init();
         frame.pack();
         frame.setVisible(true);
+        
+        // Link network to display applet
+        
+        // For now, just place drawable objects in there
+        applet.addDrawable( new BNNodeSketch() );
     }
 }
