@@ -89,9 +89,16 @@ public class MainPApplet extends PApplet {
 
         // All-object operations
         synchronized( drawables ){
+            boolean nofocus = true;
             for( ProcessingDrawable d : drawables ){
                 // Determine if we're mousing over something
-                panning &= !d.isMouseOver(msX, msY);
+                if( nofocus && d.isMouseOver(msX, msY) ){
+                    // If we are, disable catch focus, disable panning
+                    panning = false;
+                    nofocus = false;
+                    // send the mouse event to the object
+                    d.handleMouse( msX, msY, pmsX, pmsY, mousePressed );
+                }
                 // Draw object
                 d.draw();
             }

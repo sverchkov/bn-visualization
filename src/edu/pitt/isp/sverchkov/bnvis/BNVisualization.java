@@ -4,7 +4,10 @@
  */
 package edu.pitt.isp.sverchkov.bnvis;
 
+import edu.pitt.isp.sverchkov.bn.BNUtils;
+import edu.pitt.isp.sverchkov.bn.BayesNet;
 import java.awt.BorderLayout;
+import java.util.*;
 import javax.swing.JFrame;
 
 /**
@@ -30,15 +33,60 @@ public class BNVisualization {
         frame.setVisible(true);
         
         // Link network to display applet
+        List<BNNodeSketch> sketches = sketchesFromNet( newNet() );
+
+        for( ProcessingDrawable d : sketches )
+            applet.addDrawable( d );
+    }
+    
+    private static BayesNet<String,String> newNet(){
+        return new BayesNet<String,String>(){
+
+            @Override
+            public int size() {
+                return 3;
+            }
+
+            @Override
+            public Collection<String> parents(String node) {
+                return node.equals("C") ? Arrays.asList("A","B") : Collections.EMPTY_SET;
+            }
+
+            @Override
+            public Collection<String> values(String node) {
+                return Arrays.asList( "Yes", "No", "Maybe" );
+            }
+
+            @Override
+            public double probability(Map<String, String> outcomes, Map<String, String> conditions) {
+                return 0.33333333;
+            }
+
+            @Override
+            public Iterator<String> iterator() {
+                return Arrays.asList("A","B","C").iterator();
+            }
+        };
+    }
+
+    private static List<BNNodeSketch> sketchesFromNet(BayesNet<String,String> net) {
         
-        // For now, just place drawable objects in there
-        BNNodeSketch
-                a = new BNNodeSketch( 100, 100),
-                b = new BNNodeSketch( 200, 100),
-                c = new BNNodeSketch( 150, 300);
-        applet.addDrawable( a );
-        applet.addDrawable( b );
-        applet.addDrawable( c );
-        c.addParentNodes( a, b );
+        List<BNNodeSketch> nodes = new ArrayList<>();
+        Map<String,BNNodeSketch> nodeMap = new HashMap<>();
+        
+        // Make models and sketches
+        for( String name : BNUtils.nodesInTopOrder(net) ){
+            BNNodeModel model = new BNNodeModelImpl( net, name );
+            BNNodeSketch node = new BNNodeSketch(0,0,model);
+            nodes.add(node);
+            nodeMap.put(name, node);
+        }
+        
+        // Connect parents
+        for( Map.Entry<String,BNNodeSketch> entry : nodeMap.entrySet() )
+            for( String parent : net.parents(entry.getKey()) )
+                entry.getValue().addParentNodes( nodeMap.get(parent) );        
+        
+        return nodes;
     }
 }

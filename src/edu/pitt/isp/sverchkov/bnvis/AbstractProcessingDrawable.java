@@ -23,4 +23,9 @@ public abstract class AbstractProcessingDrawable implements ProcessingDrawable {
     public boolean isMouseOver() {
         return isMouseOver( p.mouseX, p.mouseY );
     }
+    
+    @Override
+    public void handleMouse() {
+        handleMouse( p.mouseX, p.mouseY, p.pmouseX, p.pmouseY, p.mousePressed );
+    }
 }

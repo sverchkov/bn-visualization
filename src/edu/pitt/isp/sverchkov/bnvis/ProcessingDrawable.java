@@ -18,4 +18,6 @@ public interface ProcessingDrawable {
     // Mouseover test
     boolean isMouseOver();
     boolean isMouseOver( float mouseX, float mouseY );
+    void handleMouse(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed);
+    void handleMouse();
 }
