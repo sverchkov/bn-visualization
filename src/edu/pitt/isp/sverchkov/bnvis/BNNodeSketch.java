@@ -49,8 +49,16 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
 
     @Override
     public void draw() {
-        
+                
         if( expanded ){
+            
+            // Compute width
+            {
+                float valwidth = 10;
+                for( String value : model.values() )
+                    valwidth = Math.max( valwidth, p.textWidth( value ) );
+                width = model.values().size() * (valwidth + SPACING);
+            }
 
             float yc = y; // c for "cursor"
 
@@ -74,13 +82,13 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                     xc += w;
                     
                     // Link to parent
-                    p.stroke(0);
+                    p.stroke(0,0,0,128);
                     for( Map.Entry<String,String> parent: row.parentAssignment().entrySet() )
                         DrawingHelpers.arrow(p,
                             parents.get(parent.getKey()).OutHandleXFor(parent.getValue()),
                             parents.get(parent.getKey()).OutHandleY(),
                             x-SPACING,
-                            yc + BARHEIGHT/2 + SPACING );
+                            yc + BARHEIGHT/2 );
                 }
                 yc += BARHEIGHT + SPACING;
             }

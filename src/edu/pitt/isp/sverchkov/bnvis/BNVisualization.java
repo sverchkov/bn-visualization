@@ -9,6 +9,9 @@ import edu.pitt.isp.sverchkov.bn.BayesNet;
 import java.awt.BorderLayout;
 import java.util.*;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 
 /**
  *
@@ -21,13 +24,25 @@ public class BNVisualization {
      */
     public static void main(String[] args) {
         
-        // Set up JFrame
+        // Make a menubar
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("File");
+        JMenuItem menuItemOpen = new JMenuItem("Open");
         
+        menu.add(menuItemOpen);
+        menuBar.add(menu);        
+        
+        // Set up JFrame        
         JFrame frame = new JFrame("BNVis v.000");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        frame.setJMenuBar(menuBar);
+        
+        // Processing canvas
         MainPApplet applet = new MainPApplet();
         frame.getContentPane().add( applet, BorderLayout.CENTER );
         applet.init();
+        
         frame.pack();
         frame.setSize(500, 500);
         frame.setVisible(true);
