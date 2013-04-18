@@ -6,6 +6,7 @@ package edu.pitt.isp.sverchkov.bnvis;
 
 import edu.pitt.isp.sverchkov.bn.BNUtils;
 import edu.pitt.isp.sverchkov.bn.BayesNet;
+import edu.pitt.isp.sverchkov.smile.BayesNetSMILE;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -80,7 +81,7 @@ public class BNVisualization {
         return nodes;
     }
     
-    private BayesNet currentNet = newNet();
+    private BayesNet<String,String> currentNet = newNet();
     private final MainPApplet applet;
     private final JFrame frame;
 
@@ -111,6 +112,7 @@ public class BNVisualization {
                         File file = fc.getSelectedFile();
 
                         // Read network object
+                        currentNet = new BayesNetSMILE( file );
 
                         // Load to canvas
                         clearAndFillApplet();
