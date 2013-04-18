@@ -65,6 +65,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
             // NodeTitle
             p.fill(0);
             p.textAlign( PApplet.CENTER );
+            p.textSize(TITLESIZE);
             p.text(model.name(), x + width/2, yc );
             
             yc += SPACING;
