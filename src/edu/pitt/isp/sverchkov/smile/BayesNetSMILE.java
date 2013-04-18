@@ -134,11 +134,11 @@ public class BayesNetSMILE implements BayesNet<String,String> {
     }
     
     public List<Float> getNodeCoordinates( String node ){
-        List<Float> coords = new ArrayList<>(2);
+        Float[] coords = new Float[2];
         Rectangle pos = net.getNodePosition(node);
-        coords.set( 0, new Float(pos.getMinX()) );
-        coords.set( 1, new Float(pos.getMinY()) );
-        return coords;
+        coords[0] = new Float(pos.getMinX());
+        coords[1] = new Float(pos.getMinY());
+        return Arrays.asList(coords);
     }
     
     /**
