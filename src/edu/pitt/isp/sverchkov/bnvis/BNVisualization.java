@@ -60,7 +60,7 @@ public class BNVisualization {
         };
     }
 
-    private static List<BNNodeSketch> sketchesFromNet(BayesNet<String,String> net) {
+    private static List<BNNodeSketch> sketchesFromNet(BayesNet<String,String> net, Map<String,List<Float>> placement ) {
         
         List<BNNodeSketch> nodes = new ArrayList<>();
         Map<String,BNNodeSketch> nodeMap = new HashMap<>();
@@ -68,7 +68,16 @@ public class BNVisualization {
         // Make models and sketches
         for( String name : BNUtils.nodesInTopOrder(net) ){
             BNNodeModel model = new BNNodeModelImpl( net, name );
-            BNNodeSketch node = new BNNodeSketch(0,0,model);
+            
+            Float x=0f, y=0f;
+            List<Float> coords = null;
+            if( null != placement && null != (coords = placement.get(name)) )
+                if( coords.size() >= 2 ){
+                    if( null == (x = coords.get(0)) ) x = 0f;
+                    if( null == (y = coords.get(1)) ) y = 0f;
+                }
+            
+            BNNodeSketch node = new BNNodeSketch(x,y,model);
             nodes.add(node);
             nodeMap.put(name, node);
         }
@@ -84,6 +93,7 @@ public class BNVisualization {
     private BayesNet<String,String> currentNet = newNet();
     private final MainPApplet applet;
     private final JFrame frame;
+    private Map<String,List<Float>> nodePlacement;
 
     public BNVisualization(){
         
@@ -118,11 +128,18 @@ public class BNVisualization {
                         File file = fc.getSelectedFile();
 
                         // Read network object
-                        currentNet = new BayesNetSMILE( file );
+                        BayesNetSMILE net = new BayesNetSMILE( file );
+                        
+                        // Get node placements
+                        nodePlacement = new HashMap<>();
+                        for( String node : net )
+                            nodePlacement.put( node, net.getNodeCoordinates(node) );
 
-                        // Load to canvas
+                        // Set net object and load to canvas
+                        currentNet = net;
                         clearAndFillApplet();
                     }
+                    
                 }else if( source == menuItemConvertIDs ){
                     if( currentNet instanceof BayesNetSMILE ){
                         BayesNetSMILE net = (BayesNetSMILE) currentNet;
@@ -161,7 +178,7 @@ public class BNVisualization {
         applet.removeDrawables();
         
         // Link network to display applet
-        List<BNNodeSketch> sketches = sketchesFromNet( currentNet );
+        List<BNNodeSketch> sketches = sketchesFromNet( currentNet, nodePlacement );
 
         for( ProcessingDrawable d : sketches )
             applet.addDrawable( d );
