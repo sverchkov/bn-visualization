@@ -27,7 +27,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     private boolean dragging = false;
     private boolean expanded = true;
     
-    public BNNodeSketch( int x, int y, BNNodeModel m ){
+    public BNNodeSketch( float x, float y, BNNodeModel m ){
         this.x = x;
         this.y = y;
         this.model = m;
