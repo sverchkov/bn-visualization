@@ -6,6 +6,7 @@ package edu.pitt.isp.sverchkov.smile;
 
 import edu.pitt.isp.sverchkov.arrays.ArrayTools;
 import edu.pitt.isp.sverchkov.bn.BayesNet;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -130,6 +131,14 @@ public class BayesNetSMILE implements BayesNet<String,String> {
     @Override
     public Iterator<String> iterator() {
         return Arrays.asList( net.getAllNodeIds() ).iterator();
+    }
+    
+    public List<Float> getNodeCoordinates( String node ){
+        List<Float> coords = new ArrayList<>(2);
+        Rectangle pos = net.getNodePosition(node);
+        coords.set( 0, new Float(pos.getMinX()) );
+        coords.set( 1, new Float(pos.getMinY()) );
+        return coords;
     }
     
     /**
