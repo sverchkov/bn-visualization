@@ -28,6 +28,21 @@ public class BayesNetSMILE implements BayesNet<String,String> {
             throw new RuntimeException(ex);
         }
     }
+    
+    /**
+     * @return whether we are currently converting SMILE IDs
+     */
+    public boolean isConvertIDs(){
+        return convertIDs;
+    }
+    
+    /**
+     * Sets whether to convert SMILE IDs
+     * @param convert true to convert SMILE IDs, false not to.
+     */
+    public void convertIDs( boolean convert ){
+        convertIDs = convert;
+    }
 
     @Override
     public int size() {
