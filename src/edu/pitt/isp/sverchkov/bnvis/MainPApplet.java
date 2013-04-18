@@ -132,4 +132,10 @@ public class MainPApplet extends PApplet {
             drawables.add(d);
         }
     }
+    
+    public void removeDrawables(){
+        synchronized( drawables ){
+            drawables.clear();
+        }
+    }
 }
