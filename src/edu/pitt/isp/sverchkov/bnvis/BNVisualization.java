@@ -93,18 +93,24 @@ public class BNVisualization {
 
         // Make a menubar
         final JMenuBar menuBar = new JMenuBar();
-        final JMenu menu = new JMenu("File");
+
+        final JMenu fileMenu = new JMenu("File");
         final JMenuItem menuItemOpen = new JMenuItem("Open");
+
+        final JMenu smileMenu = new JMenu("SMILE");
+        final JMenuItem menuItemConvertIDs = new JMenuItem("Toggle SMILE ID conversion");
         
         // Make a file chooser object
         final JFileChooser fc = new JFileChooser();
         
-        // Add the listener
-        menuItemOpen.addActionListener( new ActionListener(){
+        // Make a listener for button actions
+        final ActionListener actionListener = new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 
-                if( e.getSource() == menuItemOpen ){                
+                final Object source = e.getSource();
+                // For the save button
+                if( source == menuItemOpen ){                
                     // Filechooser call
                     final int result = fc.showOpenDialog( frame );
 
@@ -117,13 +123,24 @@ public class BNVisualization {
                         // Load to canvas
                         clearAndFillApplet();
                     }
+                }else if( source == menuItemConvertIDs ){
+                    if( currentNet instanceof BayesNetSMILE ){
+                        BayesNetSMILE net = (BayesNetSMILE) currentNet;
+                        net.convertIDs(!net.isConvertIDs());
+                        clearAndFillApplet();
+                    }
                 }
             }
-        } );
+        };
+                
+        menuItemOpen.addActionListener( actionListener );
+        menuItemConvertIDs.addActionListener(actionListener);
         
         // Connect items to frame
-        menu.add(menuItemOpen);
-        menuBar.add(menu);        
+        fileMenu.add(menuItemOpen);
+        smileMenu.add(menuItemConvertIDs);
+        menuBar.add(fileMenu);
+        menuBar.add(smileMenu);
         frame.setJMenuBar(menuBar);
         
         // Processing canvas
