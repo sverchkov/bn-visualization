@@ -7,51 +7,26 @@ package edu.pitt.isp.sverchkov.bnvis;
 import edu.pitt.isp.sverchkov.bn.BNUtils;
 import edu.pitt.isp.sverchkov.bn.BayesNet;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.*;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
+import javax.swing.*;
 
 /**
  *
  * @author YUS24
  */
 public class BNVisualization {
-
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         
-        // Make a menubar
-        JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("File");
-        JMenuItem menuItemOpen = new JMenuItem("Open");
+        BNVisualization bnv = new BNVisualization();
         
-        menu.add(menuItemOpen);
-        menuBar.add(menu);        
-        
-        // Set up JFrame        
-        JFrame frame = new JFrame("BNVis v.000");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        frame.setJMenuBar(menuBar);
-        
-        // Processing canvas
-        MainPApplet applet = new MainPApplet();
-        frame.getContentPane().add( applet, BorderLayout.CENTER );
-        applet.init();
-        
-        frame.pack();
-        frame.setSize(500, 500);
-        frame.setVisible(true);
-        
-        // Link network to display applet
-        List<BNNodeSketch> sketches = sketchesFromNet( newNet() );
-
-        for( ProcessingDrawable d : sketches )
-            applet.addDrawable( d );
+        bnv.run();
     }
     
     private static BayesNet<String,String> newNet(){
@@ -104,4 +79,74 @@ public class BNVisualization {
         
         return nodes;
     }
+    
+    private BayesNet currentNet = newNet();
+    private final MainPApplet applet;
+    private final JFrame frame;
+
+    public BNVisualization(){
+        
+        // Set up JFrame        
+        frame = new JFrame("BNVis v.000");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Make a menubar
+        final JMenuBar menuBar = new JMenuBar();
+        final JMenu menu = new JMenu("File");
+        final JMenuItem menuItemOpen = new JMenuItem("Open");
+        
+        // Make a file chooser object
+        final JFileChooser fc = new JFileChooser();
+        
+        // Add the listener
+        menuItemOpen.addActionListener( new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                if( e.getSource() == menuItemOpen ){                
+                    // Filechooser call
+                    final int result = fc.showOpenDialog( frame );
+
+                    if( result == JFileChooser.APPROVE_OPTION ){
+                        File file = fc.getSelectedFile();
+
+                        // Read network object
+
+                        // Load to canvas
+                        clearAndFillApplet();
+                    }
+                }
+            }
+        } );
+        
+        // Connect items to frame
+        menu.add(menuItemOpen);
+        menuBar.add(menu);        
+        frame.setJMenuBar(menuBar);
+        
+        // Processing canvas
+        applet = new MainPApplet();
+        frame.getContentPane().add( applet, BorderLayout.CENTER );
+    }
+    
+    public void run(){
+        applet.init();
+        
+        frame.pack();
+        frame.setSize(500, 500);
+        frame.setVisible(true);
+    }
+    
+    private void clearAndFillApplet(){
+        
+        applet.removeDrawables();
+        
+        // Link network to display applet
+        List<BNNodeSketch> sketches = sketchesFromNet( currentNet );
+
+        for( ProcessingDrawable d : sketches )
+            applet.addDrawable( d );
+
+    }
+    
 }
