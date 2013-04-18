@@ -25,7 +25,7 @@ public class BNNodeModelImpl implements BNNodeModel {
         
         Map<String,Collection<String>> setMap = new HashMap<>();
         for( String parent : net.parents(node) )
-            setMap.put(parent, net.values(node));
+            setMap.put(parent, net.values(parent));
         
         // Make CPTs
         for( Map<String,String> assignment : new Assignments<>( setMap ) ){
