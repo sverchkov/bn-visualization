@@ -13,6 +13,8 @@ import processing.core.PApplet;
 public interface ProcessingDrawable {
     // Needs to connect to the PApplet
     void setParentApplet( PApplet applet );
+    // Initialization
+    void init();
     // Where the magic happens
     void draw();
     // Mouseover test
