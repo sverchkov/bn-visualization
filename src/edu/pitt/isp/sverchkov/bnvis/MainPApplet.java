@@ -134,6 +134,7 @@ public class MainPApplet extends PApplet {
         d.setParentApplet(this);
         synchronized( drawables ){
             drawables.add(d);
+            d.init();
         }
     }
     
