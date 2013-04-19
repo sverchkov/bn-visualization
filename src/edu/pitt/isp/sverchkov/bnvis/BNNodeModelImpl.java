@@ -47,7 +47,7 @@ public class BNNodeModelImpl implements BNNodeModel {
     }
 
     @Override
-    public Iterable<? extends CPTRow> activeCPTS() {
+    public List<CPTRow> activeCPTS() {
         return cpt;
     }
     

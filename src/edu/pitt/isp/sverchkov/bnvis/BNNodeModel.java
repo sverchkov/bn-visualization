@@ -14,6 +14,6 @@ public interface BNNodeModel {
     
     String name();
     Collection<String> values();
-    Iterable<? extends CPTRow> activeCPTS();
+    Collection<? extends CPTRow> activeCPTS();
     
 }
