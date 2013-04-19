@@ -122,13 +122,15 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
 
     @Override
     public void update(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed) {
-        if ( dragging && mousePressed ){
-            x = oldX + mouseX - pmouseX;
-            y = oldY + mouseY - pmouseY;            
+        if( focus ){
+            if ( dragging && mousePressed ){
+                x = oldX + mouseX - pmouseX;
+                y = oldY + mouseY - pmouseY;            
+            }
+            oldX = x;
+            oldY = y;
+            dragging = mousePressed;
         }
-        oldX = x;
-        oldY = y;
-        dragging = mousePressed;
     }
     
     private void setColorForValue( int value ){
