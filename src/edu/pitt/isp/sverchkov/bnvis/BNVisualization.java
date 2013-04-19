@@ -82,7 +82,7 @@ public class BNVisualization {
             nodeMap.put(name, node);
         }
         
-        // Connect parents
+        // Connect parents 
         for( Map.Entry<String,BNNodeSketch> entry : nodeMap.entrySet() )
             for( String parent : net.parents(entry.getKey()) )
                 entry.getValue().addParentNodes( nodeMap.get(parent) );        
