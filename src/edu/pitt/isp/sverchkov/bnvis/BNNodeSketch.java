@@ -32,6 +32,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     private CPTRow[] visibleRows;
     private float[] valueTextX;
     private float valueTextY;
+    private int highlightCol = -1, highlightRow = -1;
     
     public BNNodeSketch( float x, float y, BNNodeModel m ){
         this.x = x;
@@ -69,11 +70,11 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                 for( int c=0; c<barXYWs[r].length; c++ ){
                     
                     // Draw the bar
-                    setColorForValue( c );
+                    setColorForCell( r, c, true, false );
                     p.rect( barXYWs[r][c][0], barXYWs[r][c][1], barXYWs[r][c][2], BARHEIGHT );
                     
                     // Link to parent
-                    p.stroke(0,0,0,128);
+                    setColorForCell( r, -1, false, true );
                     for( Map.Entry<String,String> parent: visibleRows[r].parentAssignment().entrySet() )
                         DrawingHelpers.arrow(p,
                             parents.get(parent.getKey()).OutHandleXFor(parent.getValue()),
@@ -87,7 +88,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                 p.textSize(VLABELSIZE);
                 int c = 0;
                 for( String value : model.values() ){
-                    setColorForValue( c );
+                    setColorForCell( -1, c, true, false );
                     p.text(value, valueTextX[c], valueTextY );
                     ++c;
                 }
@@ -99,8 +100,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
             for( BNNodeSketch parent : parents.values() ){
                 DrawingHelpers.arrow(p, parent.x, parent.y, x, y );
             }        
-        }
-        
+        }        
     }
 
     @Override
@@ -119,10 +119,14 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
         }
     }
     
-    private void setColorForValue( int value ){
-        int color = (value%2)*50;
-        p.noStroke();
-        p.fill( color );
+    private void setColorForCell( int row, int col, boolean fill, boolean stroke ){
+        
+        int color = col < 0 ? 0 : (col%2)*50;
+        if( ( col != -1 && col == highlightCol ) || ( row != -1 && row == highlightRow ) ){
+            color = p.color( 0, 128-color, 0 );
+        }
+        if( fill ) p.fill( color ); else p.noFill();
+        if( stroke ) p.stroke( color ); else p.noStroke();
     }
     
     public float OutHandleXFor( String value ){
@@ -134,11 +138,24 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     }
 
     private void recomputeDrawing(float mouseX, float mouseY) {
+        
+        // Recompute positions of all elements
         recomputePositions();
-        /*for( col : columns )
-            if( col.mouseOver() ) col.highlight();
-        for( row : rows )
-            if( row.mouseOver() ) row.highlight();*/
+        
+        // Highlighting
+        highlightCol = -1;
+        highlightRow = -1;
+        for( int row=0; row<barXYWs.length; row++ )
+            for( int col=0; col<barXYWs[row].length; col++ ){
+                float
+                        barX = barXYWs[row][col][0],
+                        barY = barXYWs[row][col][1],
+                        barW = barXYWs[row][col][2];
+                if( mouseX >= barX && mouseY >= barY && mouseX <= barX + barW && mouseY <= barY + BARHEIGHT ){
+                    highlightRow = row;
+                    highlightCol = col;
+                }
+            }
     }
 
     private void recomputePositions() {
