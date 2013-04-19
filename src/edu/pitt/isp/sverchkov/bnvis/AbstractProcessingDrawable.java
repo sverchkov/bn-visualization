@@ -13,6 +13,7 @@ import processing.core.PApplet;
 public abstract class AbstractProcessingDrawable implements ProcessingDrawable {
     
     protected PApplet p;
+    protected boolean focus;
     
     @Override
     public void setParentApplet(PApplet applet) {
@@ -25,7 +26,17 @@ public abstract class AbstractProcessingDrawable implements ProcessingDrawable {
     }
     
     @Override
-    public void handleMouse() {
-        handleMouse( p.mouseX, p.mouseY, p.pmouseX, p.pmouseY, p.mousePressed );
+    public void update() {
+        update( p.mouseX, p.mouseY, p.pmouseX, p.pmouseY, p.mousePressed );
+    }
+    
+    @Override
+    public boolean hasFocus() {
+        return focus;
+    }
+    
+    @Override
+    public void setFocus( boolean focus ){
+        this.focus = focus;
     }
 }

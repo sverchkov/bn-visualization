@@ -97,7 +97,7 @@ public class MainPApplet extends PApplet {
                     panning = false;
                     nofocus = false;
                     // send the mouse event to the object
-                    d.handleMouse( msX, msY, pmsX, pmsY, mousePressed );
+                    d.update( msX, msY, pmsX, pmsY, mousePressed );
                 }
                 // Draw object
                 d.draw();

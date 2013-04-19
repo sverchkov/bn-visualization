@@ -18,6 +18,10 @@ public interface ProcessingDrawable {
     // Mouseover test
     boolean isMouseOver();
     boolean isMouseOver( float mouseX, float mouseY );
-    void handleMouse(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed);
-    void handleMouse();
+    // Focus setter+getter
+    void setFocus( boolean focus );
+    boolean hasFocus();
+    // Update needs to be called before draw
+    void update(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed);
+    void update();
 }
