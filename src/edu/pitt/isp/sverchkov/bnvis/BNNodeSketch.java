@@ -122,7 +122,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
 
     @Override
     public void handleMouse(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed) {
-        if ( dragging ){
+        if ( dragging && mousePressed ){
             x = oldX + mouseX - pmouseX;
             y = oldY + mouseY - pmouseY;            
         }
