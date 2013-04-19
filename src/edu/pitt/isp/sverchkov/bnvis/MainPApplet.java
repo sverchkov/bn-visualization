@@ -96,12 +96,16 @@ public class MainPApplet extends PApplet {
                     // If we are, disable catch focus, disable panning
                     panning = false;
                     nofocus = false;
-                    // send the mouse event to the object
-                    d.update( msX, msY, pmsX, pmsY, mousePressed );
-                }
-                // Draw object
-                d.draw();
+                    // Send the focus to the object
+                    d.setFocus( true );
+                }else
+                    d.setFocus( false );
+                // Object update call
+                d.update( msX, msY, pmsX, pmsY, mousePressed );
             }
+            // Draw objects
+            for( ProcessingDrawable d : drawables )
+                d.draw();
         }
         
         /* Mouse position test
