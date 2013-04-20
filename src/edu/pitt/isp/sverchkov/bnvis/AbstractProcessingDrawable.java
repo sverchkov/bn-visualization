@@ -27,7 +27,7 @@ public abstract class AbstractProcessingDrawable implements ProcessingDrawable {
     
     @Override
     public void update() {
-        update( p.mouseX, p.mouseY, p.pmouseX, p.pmouseY, p.mousePressed );
+        update( p.mouseX, p.mouseY, p.pmouseX, p.pmouseY, p.mousePressed, p.mouseButton );
     }
     
     @Override

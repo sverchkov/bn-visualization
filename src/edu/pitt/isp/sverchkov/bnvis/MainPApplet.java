@@ -101,7 +101,7 @@ public class MainPApplet extends PApplet {
                 }else
                     d.setFocus( false );
                 // Object update call
-                d.update( msX, msY, pmsX, pmsY, mousePressed );
+                d.update( msX, msY, pmsX, pmsY, mousePressed, mouseButton );
             }
             // Draw objects
             for( ProcessingDrawable d : drawables )

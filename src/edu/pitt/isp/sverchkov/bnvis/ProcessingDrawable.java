@@ -24,7 +24,7 @@ public interface ProcessingDrawable {
     void setFocus( boolean focus );
     boolean hasFocus();
     // Update needs to be called before draw
-    void update(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed);
+    void update(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed, int mouseButton);
     void update();
     // Coordinates
     float getMinX();

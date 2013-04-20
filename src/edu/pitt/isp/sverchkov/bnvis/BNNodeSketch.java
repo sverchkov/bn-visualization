@@ -77,12 +77,16 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                     
                     // Link to parent
                     setColorForCell( r, -1, false, true );
-                    for( Map.Entry<String,String> parent: visibleRows[r].parentAssignment().entrySet() )
+                    for( Map.Entry<String,String> parent: visibleRows[r].parentAssignment().entrySet() ){
+                        // Determine if link should come from left or right
+                        float sourceX = parents.get(parent.getKey()).OutHandleXFor(parent.getValue());
+                        float destX = x + ( sourceX < x + width/2 ? -SPACING : width+SPACING );
                         DrawingHelpers.arrow(p,
-                            parents.get(parent.getKey()).OutHandleXFor(parent.getValue()),
+                            sourceX,
                             parents.get(parent.getKey()).OutHandleY(),
-                            x-SPACING,
+                            destX,
                             barXYWs[r][c][1] + BARHEIGHT/2 );
+                    }
                 }
             
             // Draw value labels
@@ -106,9 +110,9 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     }
 
     @Override
-    public void update(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed) {
+    public void update(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed, int mouseButton ) {
         if( focus ){
-            if ( dragging && mousePressed ){
+            if ( dragging && mousePressed && mouseButton == PApplet.LEFT ){
                 x = oldX + mouseX - pmouseX;
                 y = oldY + mouseY - pmouseY;            
             }
