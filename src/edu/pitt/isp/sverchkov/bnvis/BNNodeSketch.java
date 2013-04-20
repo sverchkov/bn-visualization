@@ -127,7 +127,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
         
         int color = col < 0 ? 0 : (col%2)*50;
         if( ( col != -1 && col == highlightCol ) || ( row != -1 && row == highlightRow ) ){
-            color = p.color( 0, 128-color, 0 );
+            color = p.color( 0, 78+color, 0 );
         }
         if( fill ) p.fill( color ); else p.noFill();
         if( stroke ) p.stroke( color ); else p.noStroke();
