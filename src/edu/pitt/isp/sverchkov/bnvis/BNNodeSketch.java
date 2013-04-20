@@ -18,6 +18,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     public static final float BARHEIGHT = 10;
     public static final float TITLESIZE = 20;
     public static final float VLABELSIZE = 10;
+    public static final float SQRT4THIRDS = (float) Math.sqrt( 4/3 );
     
     private final Map<String,BNNodeSketch> parents = new HashMap<>();
     private final Map<String,Float> outHandleXOs = new HashMap<>(); // X offset of outgoing handles
@@ -26,8 +27,9 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     private float x,y,width = 50,height = 50;
     private float oldX, oldY;
     private boolean dragging = false;
-    private boolean expanded = true;
+    private boolean expanded = false;
     private boolean focusP = false;
+    private boolean mousePressedP = false;
     
     private float nodeTitleY;
     private float[][][] barXYWs;
@@ -102,9 +104,17 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
             
         }else{        
             // p.rectMode(PApplet.CENTER);
-            p.rect(x,y,width,height);
+            p.ellipseMode( PApplet.CORNER );
+            p.noFill();
+            p.stroke(0);
+            p.ellipse(x, y, width, height);
+            p.textSize(TITLESIZE);
+            p.noStroke();
+            p.fill(0);
+            p.text( model.name(), x+width/2, y+height/2+TITLESIZE/2);
             for( BNNodeSketch parent : parents.values() ){
-                DrawingHelpers.arrow(p, parent.x, parent.y, x, y );
+                p.stroke(255,0,0);
+                DrawingHelpers.arrowEllipseToEllipse(p, parent.x, parent.y, parent.width, parent.height, x, y, width, height );
             }        
         }        
     }
@@ -112,19 +122,25 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     @Override
     public void update(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed, int mouseButton ) {
         if( focus ){
-            if ( dragging && mousePressed && mouseButton == PApplet.LEFT ){
+            if ( dragging && mousePressedP && mousePressed && mouseButton == PApplet.LEFT ){
                 x = oldX + mouseX - pmouseX;
                 y = oldY + mouseY - pmouseY;            
             }
             oldX = x;
             oldY = y;
             dragging = mousePressed;
+            
+            // Expand/collapse node
+            if( mousePressedP && !mousePressed && mouseButton == PApplet.RIGHT )
+                expanded = !expanded;
         }
         
         // Only recompute positions & highlighting on demand
         if( focus || focusP ) recomputeDrawing( mouseX, mouseY );
         
         focusP = focus;
+        
+        mousePressedP = mousePressed && focus;
     }
     
     private void setColorForCell( int row, int col, boolean fill, boolean stroke ){
@@ -147,50 +163,55 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
 
     private void recomputeDrawing(float mouseX, float mouseY) {
         
-        // Recompute positions of all elements
-        recomputePositions();
-        
-        // Highlighting
-        highlightCol = -1;
-        highlightRow = -1;
-        // Check if mouse is over a cell
-        for( int row=0; row<barXYWs.length; row++ )
-            for( int col=0; col<barXYWs[row].length; col++ ){
-                float
-                        barX = barXYWs[row][col][0],
-                        barY = barXYWs[row][col][1],
-                        barW = barXYWs[row][col][2];
-                if( mouseX >= barX && mouseY >= barY && mouseX <= barX + barW && mouseY <= barY + BARHEIGHT ){
-                    highlightRow = row;
-                    highlightCol = col;
-                }
-            }
-        if( -1 == highlightRow ){ // No row is highlighted
-            
-            // Make sure parent does not highlight a column
-            for( BNNodeSketch parent : parents.values() )
-                parent.highlightCol = -1;
-            
-            // Check if mouse is over a value label
-            if( mouseY >= valueTextY && mouseY <= valueTextY + VLABELSIZE ){
-                int col =0;
-                p.textSize( VLABELSIZE );
-                for( String value : model.values() ){
-                    float w = p.textWidth(value) / 2;
-                    if( mouseX >= valueTextX[col] - w && mouseX <= valueTextX[col] + w )
+        if( expanded ){
+            // Recompute positions of all elements
+            recomputePositions();
+
+            // Highlighting
+            highlightCol = -1;
+            highlightRow = -1;
+            // Check if mouse is over a cell
+            for( int row=0; row<barXYWs.length; row++ )
+                for( int col=0; col<barXYWs[row].length; col++ ){
+                    float
+                            barX = barXYWs[row][col][0],
+                            barY = barXYWs[row][col][1],
+                            barW = barXYWs[row][col][2];
+                    if( mouseX >= barX && mouseY >= barY && mouseX <= barX + barW && mouseY <= barY + BARHEIGHT ){
+                        highlightRow = row;
                         highlightCol = col;
-                    ++col;
+                    }
+                }
+            if( -1 == highlightRow ){ // No row is highlighted
+
+                // Make sure parent does not highlight a column
+                for( BNNodeSketch parent : parents.values() )
+                    parent.highlightCol = -1;
+
+                // Check if mouse is over a value label
+                if( mouseY >= valueTextY && mouseY <= valueTextY + VLABELSIZE ){
+                    int col =0;
+                    p.textSize( VLABELSIZE );
+                    for( String value : model.values() ){
+                        float w = p.textWidth(value) / 2;
+                        if( mouseX >= valueTextX[col] - w && mouseX <= valueTextX[col] + w )
+                            highlightCol = col;
+                        ++col;
+                    }
+                }
+            } else { // Row is highlighted
+
+                // Highlight relevant parent columns
+                for( Map.Entry<String,String> entry : visibleRows[ highlightRow ].parentAssignment().entrySet() ){
+                    BNNodeSketch parent = parents.get( entry.getKey() );
+                    parent.highlightCol = ArrayTools.firstIndexOf( entry.getValue(), parent.model.values() );
                 }
             }
-        } else { // Row is highlighted
-            
-            // Highlight relevant parent columns
-            for( Map.Entry<String,String> entry : visibleRows[ highlightRow ].parentAssignment().entrySet() ){
-                BNNodeSketch parent = parents.get( entry.getKey() );
-                parent.highlightCol = ArrayTools.firstIndexOf( entry.getValue(), parent.model.values() );
-            }
-        }
-        
+        }else{
+            p.textSize( TITLESIZE );
+            width = SQRT4THIRDS*(p.textWidth( model.name() ) + 2*SPACING);
+            height = 2*(TITLESIZE+2*SPACING);
+        }        
     }
 
     private void recomputePositions() {
