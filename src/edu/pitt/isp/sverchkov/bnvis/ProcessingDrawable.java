@@ -26,4 +26,9 @@ public interface ProcessingDrawable {
     // Update needs to be called before draw
     void update(float mouseX, float mouseY, float pmouseX, float pmouseY, boolean mousePressed);
     void update();
+    // Coordinates
+    float getMinX();
+    float getMinY();
+    float getMaxX();
+    float getMaxY();
 }
