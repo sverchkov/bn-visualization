@@ -161,7 +161,12 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                     highlightCol = col;
                 }
             }
-        if( -1 == highlightRow ){
+        if( -1 == highlightRow ){ // No row is highlighted
+            
+            // Make sure parent does not highlight a column
+            for( BNNodeSketch parent : parents.values() )
+                parent.highlightCol = -1;
+            
             // Check if mouse is over a value label
             if( mouseY >= valueTextY && mouseY <= valueTextY + VLABELSIZE ){
                 int col =0;
@@ -174,6 +179,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                 }
             }
         } else { // Row is highlighted
+            
             // Highlight relevant parent columns
             for( Map.Entry<String,String> entry : visibleRows[ highlightRow ].parentAssignment().entrySet() ){
                 BNNodeSketch parent = parents.get( entry.getKey() );
