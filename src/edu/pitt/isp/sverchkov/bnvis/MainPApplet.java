@@ -37,7 +37,7 @@ public class MainPApplet extends PApplet {
     private final MouseWheelListener mouseWheel = new MouseWheelListener(){
         @Override
         public void mouseWheelMoved(MouseWheelEvent mwe) {
-            zoom += mwe.getWheelRotation()*ZOOMSTEP;
+            zoom -= mwe.getWheelRotation()*ZOOMSTEP;
             if( zoom <= MINZOOM ) zoom = MINZOOM;
         }
     };
@@ -141,6 +141,29 @@ public class MainPApplet extends PApplet {
     public void removeDrawables(){
         synchronized( drawables ){
             drawables.clear();
+        }
+    }
+    
+    public void zoomToFitDrawables(){
+        float
+                minX = Float.POSITIVE_INFINITY,
+                minY = Float.POSITIVE_INFINITY,
+                maxX = Float.NEGATIVE_INFINITY,
+                maxY = Float.POSITIVE_INFINITY;
+        synchronized( drawables ){
+            for( ProcessingDrawable d : drawables ){
+                minX = Math.min( minX, d.getMinX() );
+                maxX = Math.max( maxX, d.getMaxX() );
+                minY = Math.min( minY, d.getMinY() );
+                maxY = Math.max( maxY, d.getMaxY() );
+            }
+        }
+        if( minX < maxX && minY < maxY ){
+            // Figure out zoom
+            zoom = Math.max( width/(maxX - minX) , height/(maxY - minY));
+            // Pan
+            pmsX = msX = ( mouseX - minX )*zoom;
+            pmsY = msY = ( mouseY - minY )*zoom;
         }
     }
 }

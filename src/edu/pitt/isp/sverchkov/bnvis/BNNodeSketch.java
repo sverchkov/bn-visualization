@@ -4,6 +4,7 @@
  */
 package edu.pitt.isp.sverchkov.bnvis;
 
+import edu.pitt.isp.sverchkov.arrays.ArrayTools;
 import java.util.*;
 import processing.core.PApplet;
 
@@ -26,6 +27,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     private float oldX, oldY;
     private boolean dragging = false;
     private boolean expanded = true;
+    private boolean focusP = false;
     
     private float nodeTitleY;
     private float[][][] barXYWs;
@@ -113,10 +115,12 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
             oldX = x;
             oldY = y;
             dragging = mousePressed;
-            
-            // Only recompute positions & highlighting on demand
-            recomputeDrawing( mouseX, mouseY );
         }
+        
+        // Only recompute positions & highlighting on demand
+        if( focus || focusP ) recomputeDrawing( mouseX, mouseY );
+        
+        focusP = focus;
     }
     
     private void setColorForCell( int row, int col, boolean fill, boolean stroke ){
@@ -145,6 +149,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
         // Highlighting
         highlightCol = -1;
         highlightRow = -1;
+        // Check if mouse is over a cell
         for( int row=0; row<barXYWs.length; row++ )
             for( int col=0; col<barXYWs[row].length; col++ ){
                 float
@@ -156,6 +161,26 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                     highlightCol = col;
                 }
             }
+        if( -1 == highlightRow ){
+            // Check if mouse is over a value label
+            if( mouseY >= valueTextY && mouseY <= valueTextY + VLABELSIZE ){
+                int col =0;
+                p.textSize( VLABELSIZE );
+                for( String value : model.values() ){
+                    float w = p.textWidth(value) / 2;
+                    if( mouseX >= valueTextX[col] - w && mouseX <= valueTextX[col] + w )
+                        highlightCol = col;
+                    ++col;
+                }
+            }
+        } else { // Row is highlighted
+            // Highlight relevant parent columns
+            for( Map.Entry<String,String> entry : visibleRows[ highlightRow ].parentAssignment().entrySet() ){
+                BNNodeSketch parent = parents.get( entry.getKey() );
+                parent.highlightCol = ArrayTools.firstIndexOf( entry.getValue(), parent.model.values() );
+            }
+        }
+        
     }
 
     private void recomputePositions() {
@@ -220,5 +245,25 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     @Override
     public void init() {
         recomputePositions();
+    }
+
+    @Override
+    public float getMinX() {
+        return x;
+    }
+
+    @Override
+    public float getMinY() {
+        return y;
+    }
+
+    @Override
+    public float getMaxX() {
+        return x + width;
+    }
+
+    @Override
+    public float getMaxY() {
+        return y + width;
     }
 }

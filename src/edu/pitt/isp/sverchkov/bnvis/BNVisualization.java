@@ -183,6 +183,7 @@ public class BNVisualization {
         for( ProcessingDrawable d : sketches )
             applet.addDrawable( d );
 
+        applet.zoomToFitDrawables();
     }
     
 }
