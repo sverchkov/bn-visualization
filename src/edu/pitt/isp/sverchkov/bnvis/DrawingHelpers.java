@@ -4,6 +4,8 @@
  */
 package edu.pitt.isp.sverchkov.bnvis;
 
+import edu.pitt.isp.sverchkov.geometry.LineTerminus;
+import edu.pitt.isp.sverchkov.geometry.Point;
 import processing.core.PApplet;
 
 /**
@@ -31,6 +33,16 @@ public class DrawingHelpers {
         p.popMatrix();
     }
     
+    public static void arrow( PApplet p, LineTerminus s, LineTerminus d ){
+        final Point
+                source = s.getContactPointFrom( d ),
+                dest = d.getContactPointFrom( s );
+        
+        arrow( p, (float) source.x, (float) source.y, (float) dest.x, (float) dest.y );
+    }
+    
+    /*
+    @Deprecated
     public static void arrowPointToEllipse( PApplet p, float sourceX, float sourceY, float destX, float destY, float destW, float destH ){
         final double centerX = destX+destW/2, centerY = destY+destH/2; 
         double x=0, y=destH/2 * Math.signum(sourceY-centerY);
@@ -43,6 +55,7 @@ public class DrawingHelpers {
         arrow( p, sourceX, sourceY, (float)(centerX+x), (float)(centerY+y) );
     }
     
+    @Deprecated
     public static void arrowEllipseToEllipse( PApplet p, float sourceX, float sourceY, float sourceW, float sourceH, float destX, float destY, float destW, float destH ){
         final double centerX = sourceX+sourceW/2, centerY = sourceY+sourceH/2;
         final double dX = destX+destW/2-centerX;
@@ -54,5 +67,5 @@ public class DrawingHelpers {
             y = x*slope;
         }
         arrowPointToEllipse( p, (float)(centerX+x), (float)(centerY+y), destX, destY, destW, destH );
-    }
+    }*/
 }

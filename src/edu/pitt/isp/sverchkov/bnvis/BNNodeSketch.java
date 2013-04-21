@@ -4,6 +4,9 @@
  */
 package edu.pitt.isp.sverchkov.bnvis;
 
+import edu.pitt.isp.sverchkov.geometry.Ellipse;
+import edu.pitt.isp.sverchkov.geometry.Point;
+import edu.pitt.isp.sverchkov.geometry.LineTerminus;
 import edu.pitt.isp.sverchkov.arrays.ArrayTools;
 import java.util.*;
 import processing.core.PApplet;
@@ -80,15 +83,13 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                     
                     // Link to parent
                     setColorForCell( r, -1, false, true );
-                    for( Map.Entry<String,String> parent: visibleRows[r].parentAssignment().entrySet() ){
+                    for( Map.Entry<String,String> entry: visibleRows[r].parentAssignment().entrySet() ){
                         // Determine if link should come from left or right
-                        float sourceX = parents.get(parent.getKey()).OutHandleXFor(parent.getValue());
-                        float destX = x + ( sourceX < x + width/2 ? -SPACING : width+SPACING );
-                        DrawingHelpers.arrow(p,
-                            sourceX,
-                            parents.get(parent.getKey()).OutHandleY(),
-                            destX,
-                            barXYWs[r][c][1] + BARHEIGHT/2 );
+                        BNNodeSketch parent = parents.get(entry.getKey());
+                        LineTerminus
+                                source = parent.OutHandle( entry.getValue() ),
+                                dest = new Point( x + ( source.getLineTarget().x < x + width/2 ? -SPACING : width+SPACING ), barXYWs[r][c][1] + BARHEIGHT/2 );
+                        DrawingHelpers.arrow(p, source, dest );
                     }
                 }
             
@@ -115,7 +116,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
             p.text( model.name(), x+width/2, y+height/2+TITLESIZE/2);
             for( BNNodeSketch parent : parents.values() ){
                 p.stroke(255,0,0);
-                DrawingHelpers.arrowEllipseToEllipse(p, parent.x, parent.y, parent.width, parent.height, x, y, width, height );
+                DrawingHelpers.arrow(p, parent.OutHandle(null), new Ellipse( x, y, width, height ) );
             }        
         }        
     }
@@ -154,12 +155,10 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
         if( stroke ) p.stroke( color ); else p.noStroke();
     }
     
-    public float OutHandleXFor( String value ){
-        return x + outHandleXOs.get(value);
-    }
-    
-    public float OutHandleY(){
-        return y + height;
+    public LineTerminus OutHandle( String value ){
+        if( expanded && outHandleXOs.containsKey( value ) )
+            return new Point( x + outHandleXOs.get( value ), y + height );
+        return new Ellipse( x, y, width, height );
     }
 
     private void recomputeDrawing(float mouseX, float mouseY) {
