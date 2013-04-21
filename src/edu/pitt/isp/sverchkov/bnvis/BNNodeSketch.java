@@ -61,11 +61,12 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     @Override
     public void draw() {
                 
+        p.textAlign( PApplet.CENTER );
+            
         if( expanded ){
 
             // NodeTitle
             p.fill(0);
-            p.textAlign( PApplet.CENTER );
             p.textSize(TITLESIZE);
             p.text(model.name(), x + width/2, nodeTitleY );
             
@@ -163,10 +164,10 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
 
     private void recomputeDrawing(float mouseX, float mouseY) {
         
-        if( expanded ){
-            // Recompute positions of all elements
-            recomputePositions();
+        // Recompute positions of all elements
+        recomputePositions();
 
+        if( expanded ){
             // Highlighting
             highlightCol = -1;
             highlightRow = -1;
@@ -207,70 +208,73 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                     parent.highlightCol = ArrayTools.firstIndexOf( entry.getValue(), parent.model.values() );
                 }
             }
+        }
+    }
+
+    private void recomputePositions() {
+
+        if( expanded ){
+
+            final int nValues = model.values().size();
+
+            // Compute width
+            {
+                float valwidth = 10;
+                for( String value : model.values() )
+                    valwidth = Math.max( valwidth, p.textWidth( value ) );
+                width = nValues * (valwidth + SPACING);
+            }
+
+            float yc = y + TITLESIZE; // c for "cursor"
+
+            // Node Title y position
+            nodeTitleY = yc;
+
+            yc += SPACING;
+
+            // Compute CPT Bars
+            {
+                int r = 0;
+                barXYWs = new float[model.activeCPTS().size()][nValues][];
+                visibleRows = new CPTRow[barXYWs.length];
+                for( CPTRow row : model.activeCPTS() ){
+                    visibleRows[r] = row;
+                    int c = 0;
+                    float xc = x;
+                    for( double cp : row ){ // cp is "conditional probability"
+
+                        // Compute the bar
+                        float w = (float) cp*width;
+                        barXYWs[r][c] = new float[]{xc, yc, w};
+                        xc += w;
+                        ++c;
+                    }
+                    yc += BARHEIGHT + SPACING;
+                    ++r;
+                }
+            }
+
+            // Compute value label and outgoing handle positions
+            {
+                yc += VLABELSIZE;
+                valueTextY = yc;
+                if( valueTextX == null || valueTextX.length != nValues )
+                    valueTextX = new float[nValues];
+                float w = width/nValues, wc = w/2;
+                int c = 0;
+                for( String value : model.values() ){
+                    valueTextX[c++] = x+wc;
+                    outHandleXOs.put( value, wc );
+                    wc += w;
+                }
+            }
+
+            height = yc-y;
         }else{
             p.textSize( TITLESIZE );
             width = SQRT4THIRDS*(p.textWidth( model.name() ) + 2*SPACING);
             height = 2*(TITLESIZE+2*SPACING);
         }        
-    }
-
-    private void recomputePositions() {
-        
-        final int nValues = model.values().size();
-        
-        // Compute width
-        {
-            float valwidth = 10;
-            for( String value : model.values() )
-                valwidth = Math.max( valwidth, p.textWidth( value ) );
-            width = nValues * (valwidth + SPACING);
-        }
-
-        float yc = y + TITLESIZE; // c for "cursor"
-        
-        // Node Title y position
-        nodeTitleY = yc;
-
-        yc += SPACING;
-
-        // Compute CPT Bars
-        {
-            int r = 0;
-            barXYWs = new float[model.activeCPTS().size()][nValues][];
-            visibleRows = new CPTRow[barXYWs.length];
-            for( CPTRow row : model.activeCPTS() ){
-                visibleRows[r] = row;
-                int c = 0;
-                float xc = x;
-                for( double cp : row ){ // cp is "conditional probability"
-
-                    // Compute the bar
-                    float w = (float) cp*width;
-                    barXYWs[r][c] = new float[]{xc, yc, w};
-                    xc += w;
-                    ++c;
-                }
-                yc += BARHEIGHT + SPACING;
-                ++r;
-            }
-        }
-
-        // Compute value label and outgoing handle positions
-        {
-            yc += VLABELSIZE;
-            valueTextY = yc;
-            if( valueTextX == null || valueTextX.length != nValues )
-                valueTextX = new float[nValues];
-            float w = width/nValues, wc = w/2;
-            int c = 0;
-            for( String value : model.values() ){
-                valueTextX[c++] = x+wc;
-                outHandleXOs.put( value, wc );
-                wc += w;
-            }
-        }
-
-        height = yc-y;
     }
 
     @Override
