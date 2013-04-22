@@ -149,7 +149,7 @@ public class MainPApplet extends PApplet {
                 minX = Float.POSITIVE_INFINITY,
                 minY = Float.POSITIVE_INFINITY,
                 maxX = Float.NEGATIVE_INFINITY,
-                maxY = Float.POSITIVE_INFINITY;
+                maxY = Float.NEGATIVE_INFINITY;
         synchronized( drawables ){
             for( ProcessingDrawable d : drawables ){
                 minX = Math.min( minX, d.getMinX() );
@@ -162,17 +162,36 @@ public class MainPApplet extends PApplet {
     }
     
     public void zoomTo( ProcessingDrawable d ){
-        if( drawables.contains(d) )
-            zoomTo( d.getMinX()*10, d.getMinY()*10, d.getMaxX()*10, d.getMaxY()*10 );
+        if( drawables.contains(d) ){
+            // Put a x4 buffer around the object
+            final float
+                    w = d.getMaxX() - d.getMinX(),
+                    h = d.getMaxY() - d.getMinY();
+            zoomTo( d.getMinX()-4*w, d.getMinY()-4*h, d.getMaxX()+4*w, d.getMaxY()+4*h );
+        }
     }
     
     public void zoomTo( float minX, float minY, float maxX, float maxY ){
         if( minX < maxX && minY < maxY ){
-            // Figure out zoom
-            zoom = Math.max( width/(maxX - minX), height/(maxY - minY));
+            // Recall
+            // msX = mouseX / zoom + origin
+            
+            // Figure out zoom, and adjust corner to get it centered
+            final float
+                    w = maxX - minX,
+                    h = maxY - minY,
+                    wRat = width/w,
+                    hRat = height/h;
+            if( wRat < hRat ){
+                zoom = wRat;
+                minY = minY - (height/zoom - h)/2;
+            }else{
+                zoom = hRat;
+                minX = minX - (width/zoom - w)/2;
+            }
             // Pan
-            pmsX = msX = ( mouseX )*zoom + minX;
-            pmsY = msY = ( mouseY )*zoom + minY;
+            pmsX = msX = mouseX/zoom + minX;
+            pmsY = msY = mouseY/zoom + minY;
         }
     }
         
