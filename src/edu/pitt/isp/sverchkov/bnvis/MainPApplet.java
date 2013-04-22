@@ -158,12 +158,22 @@ public class MainPApplet extends PApplet {
                 maxY = Math.max( maxY, d.getMaxY() );
             }
         }
+        zoomTo( minX, minY, maxX, maxY );            
+    }
+    
+    public void zoomTo( ProcessingDrawable d ){
+        if( drawables.contains(d) )
+            zoomTo( d.getMinX()*10, d.getMinY()*10, d.getMaxX()*10, d.getMaxY()*10 );
+    }
+    
+    public void zoomTo( float minX, float minY, float maxX, float maxY ){
         if( minX < maxX && minY < maxY ){
             // Figure out zoom
-            zoom = Math.max( width/(maxX - minX) , height/(maxY - minY));
+            zoom = Math.max( width/(maxX - minX), height/(maxY - minY));
             // Pan
-            pmsX = msX = ( mouseX - minX )*zoom;
-            pmsY = msY = ( mouseY - minY )*zoom;
+            pmsX = msX = ( mouseX )*zoom + minX;
+            pmsY = msY = ( mouseY )*zoom + minY;
         }
     }
+        
 }

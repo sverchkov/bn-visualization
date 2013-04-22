@@ -94,13 +94,14 @@ public class BNVisualization {
     private final MainPApplet applet;
     private final JFrame frame;
     private Map<String,List<Float>> nodePlacement;
+    private final Map<String,BNNodeSketch> sketchMap= new HashMap<>();
 
     public BNVisualization(){
         
         // Set up JFrame        
         frame = new JFrame("BNVis v.000");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        
         // Make a menubar
         final JMenuBar menuBar = new JMenuBar();
 
@@ -109,6 +110,10 @@ public class BNVisualization {
 
         final JMenu smileMenu = new JMenu("SMILE");
         final JMenuItem menuItemConvertIDs = new JMenuItem("Toggle SMILE ID conversion");
+        
+        final JMenu zoomMenu = new JMenu("Zoom");
+        final JMenuItem menuItemFitNet = new JMenuItem("Zoom to fit net");
+        final JMenuItem menuItemZoomNode = new JMenuItem("Zoom to node");
         
         // Make a file chooser object
         final JFileChooser fc = new JFileChooser();
@@ -146,18 +151,41 @@ public class BNVisualization {
                         net.convertIDs(!net.isConvertIDs());
                         clearAndFillApplet();
                     }
+                }else if( source == menuItemFitNet ){
+                    applet.zoomToFitDrawables();
+                }else if( source == menuItemZoomNode ){
+                    System.out.println("Hi there!");
+                    String[] options = sketchMap.keySet().toArray( new String[0] );
+                    if( options.length > 0 ){
+                        System.out.println("Hi there!");
+                        String result = (String) JOptionPane.showInputDialog(
+                                frame,
+                                "Select a node to zoom in on:",
+                                "Zoom to node",
+                                JOptionPane.PLAIN_MESSAGE,
+                                null, //icon
+                                options,
+                                options[0] );
+                        ProcessingDrawable d = sketchMap.get( result );
+                        if( d != null ) applet.zoomTo(d);
+                    }
                 }
             }
         };
                 
-        menuItemOpen.addActionListener( actionListener );
+        menuItemOpen.addActionListener(actionListener);
         menuItemConvertIDs.addActionListener(actionListener);
+        menuItemFitNet.addActionListener(actionListener);
+        menuItemZoomNode.addActionListener(actionListener);
         
         // Connect items to frame
         fileMenu.add(menuItemOpen);
         smileMenu.add(menuItemConvertIDs);
+        zoomMenu.add(menuItemFitNet);
+        zoomMenu.add(menuItemZoomNode);
         menuBar.add(fileMenu);
         menuBar.add(smileMenu);
+        menuBar.add(zoomMenu);
         frame.setJMenuBar(menuBar);
         
         // Processing canvas
@@ -179,6 +207,9 @@ public class BNVisualization {
         
         // Link network to display applet
         List<BNNodeSketch> sketches = sketchesFromNet( currentNet, nodePlacement );
+        
+        // Fill find menu
+        fillFindMenu( sketches );
 
         for( ProcessingDrawable d : sketches )
             applet.addDrawable( d );
@@ -186,4 +217,9 @@ public class BNVisualization {
         applet.zoomToFitDrawables();
     }
     
+    private void fillFindMenu( List<BNNodeSketch> sketches ){
+        sketchMap.clear();
+        for( final BNNodeSketch sketch : sketches )
+            sketchMap.put( sketch.name(), sketch );
+    }
 }

@@ -101,7 +101,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                         // Determine if link should come from left or right
                         BNNodeSketch parent = parents.get(entry.getKey());
                         LineTerminus
-                                source = parent.OutHandle( entry.getValue() ),
+                                source = parent.outHandle( entry.getValue() ),
                                 dest = new Point( x + ( source.getLineTarget().x < x + width/2 ? -SPACING : width+SPACING ), barXYWs[r][c][1] + BARHEIGHT/2 );
                         DrawingHelpers.arrow(p, source, dest );
                     }
@@ -129,7 +129,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
             p.text( model.name(), x+width/2, y+height/2+TITLESIZE/2);
             for( BNNodeSketch parent : parents.values() ){
                 p.stroke(NODE_EDGE_COLOR);
-                DrawingHelpers.arrow(p, parent.OutHandle(null), new Ellipse( x, y, width, height ) );
+                DrawingHelpers.arrow(p, parent.outHandle(null), new Ellipse( x, y, width, height ) );
             }        
         }        
     }
@@ -185,7 +185,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
         if( stroke ) p.stroke( color ); else p.noStroke();
     }
     
-    public LineTerminus OutHandle( String value ){
+    public LineTerminus outHandle( String value ){
         if( expanded && outHandleXOs.containsKey( value ) )
             return new Point( x + outHandleXOs.get( value ), y + height );
         return new Ellipse( x, y, width, height );
@@ -338,5 +338,9 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     @Override
     public float getMaxY() {
         return y + width;
+    }
+    
+    public String name(){
+        return model.name();
     }
 }
