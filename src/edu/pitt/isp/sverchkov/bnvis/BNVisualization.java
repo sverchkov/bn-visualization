@@ -154,10 +154,8 @@ public class BNVisualization {
                 }else if( source == menuItemFitNet ){
                     applet.zoomToFitDrawables();
                 }else if( source == menuItemZoomNode ){
-                    System.out.println("Hi there!");
                     String[] options = sketchMap.keySet().toArray( new String[0] );
                     if( options.length > 0 ){
-                        System.out.println("Hi there!");
                         String result = (String) JOptionPane.showInputDialog(
                                 frame,
                                 "Select a node to zoom in on:",
