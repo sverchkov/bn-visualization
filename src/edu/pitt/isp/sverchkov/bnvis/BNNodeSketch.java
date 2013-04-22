@@ -189,7 +189,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                     parent.highlightCol = -1;
 
                 // Check if mouse is over a value label
-                if( mouseY >= valueTextY && mouseY <= valueTextY + VLABELSIZE ){
+                if( mouseY >= y + valueTextY && mouseY <= y + valueTextY + VLABELSIZE ){
                     int col =0;
                     p.textSize( VLABELSIZE );
                     for( String value : model.values() ){
@@ -267,6 +267,8 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                     wc += w;
                 }
             }
+            
+            yc += SPACING;
 
             height = yc-y;
         }else{
