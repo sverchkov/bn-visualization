@@ -23,6 +23,17 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     public static final float VLABELSIZE = 10;
     public static final float SQRT4THIRDS = (float) Math.sqrt( 4/3 );
     
+    // Colors encoded as 0xAARRGGBB
+    public static final int[]
+            HIGHLIGHT_T_COLOR = new int[]{ 0xffa69a00, 0xffbfb530 },// 0xff4e4e00, 0xff808000 }, // Target highlight
+            HIGHLIGHT_P_COLOR = new int[]{ 0xff216477, 0xff39aecf },// 0xff004e00, 0xff008000 }, // Primary highlight
+            HIGHLIGHT_S_COLOR = new int[]{ 0xffbf3030, 0xffff4040 };// 0xff4e0000, 0xff800000 }; // Secondaty highlight
+    public static final int PASSIVE_EDGE_COLOR = 0x30000000;
+    // Greyscale encoded as 0xWW
+    public static final int NODE_EDGE_COLOR = 0;
+    public static final int NODE_COLOR = 0;
+    public static final int[] NO_HIGHLIGHT_COLOR = new int[]{ 75, 125 };
+    
     private final Map<String,BNNodeSketch> parents = new HashMap<>();
     private final Map<String,Float> outHandleXOs = new HashMap<>(); // X offset of outgoing handles
     private final BNNodeModel model;
@@ -40,6 +51,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
     private float[] valueTextX;
     private float valueTextY;
     private int highlightCol = -1, highlightRow = -1;
+    private boolean myHighlight = false;
     
     public BNNodeSketch( float x, float y, BNNodeModel m ){
         this.x = x;
@@ -82,7 +94,9 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                     p.rect( barXYWs[r][c][0], barXYWs[r][c][1], barXYWs[r][c][2], BARHEIGHT );
                     
                     // Link to parent
-                    setColorForCell( r, -1, false, true );
+                    if( r == highlightRow ) setColorForCell( r, -1, false, true );
+                    else p.stroke( PASSIVE_EDGE_COLOR );
+                    
                     for( Map.Entry<String,String> entry: visibleRows[r].parentAssignment().entrySet() ){
                         // Determine if link should come from left or right
                         BNNodeSketch parent = parents.get(entry.getKey());
@@ -104,18 +118,17 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                 }
             }
             
-        }else{        
-            // p.rectMode(PApplet.CENTER);
+        }else{
             p.ellipseMode( PApplet.CORNER );
             p.noFill();
-            p.stroke(0);
+            p.stroke(NODE_COLOR);
             p.ellipse(x, y, width, height);
             p.textSize(TITLESIZE);
             p.noStroke();
-            p.fill(0);
+            p.fill(NODE_COLOR);
             p.text( model.name(), x+width/2, y+height/2+TITLESIZE/2);
             for( BNNodeSketch parent : parents.values() ){
-                p.stroke(255,0,0);
+                p.stroke(NODE_EDGE_COLOR);
                 DrawingHelpers.arrow(p, parent.OutHandle(null), new Ellipse( x, y, width, height ) );
             }        
         }        
@@ -145,12 +158,29 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
         mousePressedP = mousePressed && focus;
     }
     
-    private void setColorForCell( int row, int col, boolean fill, boolean stroke ){
+    private void setColorForCell( final int row, final int col, final boolean fill, final boolean stroke ){
+        
+        final boolean
+                rowHighlight = row != -1 && row == highlightRow,
+                colHighlight = col != -1 && col == highlightCol;
+        final int color = (
+            rowHighlight ?
+                ( colHighlight ? HIGHLIGHT_T_COLOR : HIGHLIGHT_S_COLOR ) :
+                ( colHighlight ? ( myHighlight ? HIGHLIGHT_P_COLOR : HIGHLIGHT_S_COLOR ) :
+                    NO_HIGHLIGHT_COLOR ) )[ col>0 ? col%2 : 0 ];
+        
+        /*
+        if( col != -1 && col == highlightCol )
+            if( row != -1 && row == highlightRow )
+                color = [c];
+            else color = ( myHighlight ? HIGHLIGHT_P_COLOR : HIGHLIGHT_S_COLOR )[c];
+        
         
         int color = col < 0 ? 0 : (col%2)*50;
         if( ( col != -1 && col == highlightCol ) || ( row != -1 && row == highlightRow ) ){
-            color = p.color( 0, 78+color, 0 );
+            color = p.color(0,78+color,0);
         }
+        */
         if( fill ) p.fill( color ); else p.noFill();
         if( stroke ) p.stroke( color ); else p.noStroke();
     }
@@ -161,10 +191,12 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
         return new Ellipse( x, y, width, height );
     }
 
-    private void recomputeDrawing(float mouseX, float mouseY) {
+    private void recomputeDrawing(final float mouseX, final float mouseY) {
         
         // Recompute positions of all elements
         recomputePositions();
+        
+        myHighlight = false;
 
         if( expanded ){
             // Highlighting
@@ -177,9 +209,10 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                             barX = barXYWs[row][col][0],
                             barY = barXYWs[row][col][1],
                             barW = barXYWs[row][col][2];
-                    if( mouseX >= barX && mouseY >= barY && mouseX <= barX + barW && mouseY <= barY + BARHEIGHT ){
+                    if( mouseX >= barX && mouseY >= barY-SPACING/2 && mouseX <= barX + barW && mouseY <= barY+SPACING/2+BARHEIGHT ){
                         highlightRow = row;
                         highlightCol = col;
+                        myHighlight = true;
                     }
                 }
             if( -1 == highlightRow ){ // No row is highlighted
@@ -189,13 +222,15 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                     parent.highlightCol = -1;
 
                 // Check if mouse is over a value label
-                if( mouseY >= y + valueTextY && mouseY <= y + valueTextY + VLABELSIZE ){
-                    int col =0;
+                if( mouseY >= valueTextY-VLABELSIZE && mouseY <= valueTextY ){
+                    int col = 0;
                     p.textSize( VLABELSIZE );
                     for( String value : model.values() ){
                         float w = p.textWidth(value) / 2;
-                        if( mouseX >= valueTextX[col] - w && mouseX <= valueTextX[col] + w )
+                        if( mouseX >= valueTextX[col] - w && mouseX <= valueTextX[col] + w ){
                             highlightCol = col;
+                            myHighlight = true;
+                        }
                         ++col;
                     }
                 }
@@ -205,6 +240,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
                 for( Map.Entry<String,String> entry : visibleRows[ highlightRow ].parentAssignment().entrySet() ){
                     BNNodeSketch parent = parents.get( entry.getKey() );
                     parent.highlightCol = ArrayTools.firstIndexOf( entry.getValue(), parent.model.values() );
+                    parent.myHighlight = false; // Might not be needed
                 }
             }
         }
@@ -219,6 +255,7 @@ public class BNNodeSketch extends AbstractProcessingDrawable implements Processi
             // Compute width
             {
                 float valwidth = 10;
+                p.textSize( VLABELSIZE );
                 for( String value : model.values() )
                     valwidth = Math.max( valwidth, p.textWidth( value ) );
                 width = nValues * (valwidth + SPACING);
