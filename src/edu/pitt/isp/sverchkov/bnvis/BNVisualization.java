@@ -149,6 +149,7 @@ public class BNVisualization {
                     applet.zoomToFitDrawables();
                 }else if( source == menuItemZoomNode ){
                     String[] options = sketchMap.keySet().toArray( new String[0] );
+                    Arrays.sort(options);
                     if( options.length > 0 ){
                         String result = (String) JOptionPane.showInputDialog(
                                 frame,
