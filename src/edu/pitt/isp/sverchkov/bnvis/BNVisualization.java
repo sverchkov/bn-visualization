@@ -107,9 +107,7 @@ public class BNVisualization {
 
         final JMenu fileMenu = new JMenu("File");
         final JMenuItem menuItemOpen = new JMenuItem("Open");
-
-        final JMenu smileMenu = new JMenu("SMILE");
-        final JMenuItem menuItemConvertIDs = new JMenuItem("Toggle SMILE ID conversion");
+        final JCheckBoxMenuItem menuItemConvertIDs = new JCheckBoxMenuItem("Convert SMILE IDs");
         
         final JMenu zoomMenu = new JMenu("Zoom");
         final JMenuItem menuItemFitNet = new JMenuItem("Zoom to fit net");
@@ -135,6 +133,9 @@ public class BNVisualization {
                         // Read network object
                         BayesNetSMILE net = new BayesNetSMILE( file );
                         
+                        // Set ID conversion
+                        net.convertIDs( menuItemConvertIDs.isSelected() );
+                        
                         // Get node placements
                         nodePlacement = new HashMap<>();
                         for( String node : net )
@@ -142,13 +143,6 @@ public class BNVisualization {
 
                         // Set net object and load to canvas
                         currentNet = net;
-                        clearAndFillApplet();
-                    }
-                    
-                }else if( source == menuItemConvertIDs ){
-                    if( currentNet instanceof BayesNetSMILE ){
-                        BayesNetSMILE net = (BayesNetSMILE) currentNet;
-                        net.convertIDs(!net.isConvertIDs());
                         clearAndFillApplet();
                     }
                 }else if( source == menuItemFitNet ){
@@ -172,17 +166,17 @@ public class BNVisualization {
         };
                 
         menuItemOpen.addActionListener(actionListener);
-        menuItemConvertIDs.addActionListener(actionListener);
         menuItemFitNet.addActionListener(actionListener);
         menuItemZoomNode.addActionListener(actionListener);
+
+        menuItemConvertIDs.setSelected(true);
         
         // Connect items to frame
         fileMenu.add(menuItemOpen);
-        smileMenu.add(menuItemConvertIDs);
+        fileMenu.add(menuItemConvertIDs);
         zoomMenu.add(menuItemFitNet);
         zoomMenu.add(menuItemZoomNode);
         menuBar.add(fileMenu);
-        menuBar.add(smileMenu);
         menuBar.add(zoomMenu);
         frame.setJMenuBar(menuBar);
         
