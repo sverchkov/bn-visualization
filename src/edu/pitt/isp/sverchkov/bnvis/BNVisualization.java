@@ -109,9 +109,15 @@ public class BNVisualization {
         final JMenuItem menuItemOpen = new JMenuItem("Open");
         final JCheckBoxMenuItem menuItemConvertIDs = new JCheckBoxMenuItem("Convert SMILE IDs");
         
+        final JMenu viewMenu = new JMenu("View");
+        
         final JMenu zoomMenu = new JMenu("Zoom");
         final JMenuItem menuItemFitNet = new JMenuItem("Zoom to fit net");
         final JMenuItem menuItemZoomNode = new JMenuItem("Zoom to node");
+        
+        final JMenu engineMenu = new JMenu("Engine");
+        final ButtonGroup engineGroup = new ButtonGroup();
+        final JRadioButtonMenuItem rbMenuItemSMILE = new JRadioButtonMenuItem("SMILE");
         
         // Make a file chooser object
         final JFileChooser fc = new JFileChooser();
@@ -165,20 +171,40 @@ public class BNVisualization {
                 }
             }
         };
-                
+        
+        // Connect action listener
         menuItemOpen.addActionListener(actionListener);
         menuItemFitNet.addActionListener(actionListener);
-        menuItemZoomNode.addActionListener(actionListener);
+        menuItemZoomNode.addActionListener(actionListener);        
 
+        // Set select box defaults
         menuItemConvertIDs.setSelected(true);
         
-        // Connect items to frame
+        // Set radio button defaults
+        rbMenuItemSMILE.setSelected(true);        
+        
+        // Assemble radio button groups
+        engineGroup.add(rbMenuItemSMILE);
+        
+        // Assemble file menu
         fileMenu.add(menuItemOpen);
         fileMenu.add(menuItemConvertIDs);
+        
+        // Assemble view menu (todo)
+        
+        // Assemble zoom menu
         zoomMenu.add(menuItemFitNet);
         zoomMenu.add(menuItemZoomNode);
+        
+        // Assemble engine menu
+        engineMenu.add(rbMenuItemSMILE);
+        
+        // Assemble menu bar
         menuBar.add(fileMenu);
+        menuBar.add(viewMenu);
         menuBar.add(zoomMenu);
+        menuBar.add(engineMenu);
+        // Connect items to frame
         frame.setJMenuBar(menuBar);
         
         // Processing canvas
