@@ -7,7 +7,7 @@ package edu.pitt.isp.sverchkov.bnvis;
 import edu.pitt.isp.sverchkov.geometry.Ellipse;
 import edu.pitt.isp.sverchkov.geometry.Point;
 import edu.pitt.isp.sverchkov.geometry.LineTerminus;
-import edu.pitt.isp.sverchkov.arrays.ArrayTools;
+import edu.pitt.isp.sverchkov.collections.ArrayTools;
 import java.util.*;
 import processing.core.PApplet;
 

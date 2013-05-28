@@ -4,7 +4,7 @@
  */
 package edu.pitt.isp.sverchkov.smile;
 
-import edu.pitt.isp.sverchkov.arrays.ArrayTools;
+import edu.pitt.isp.sverchkov.collections.ArrayTools;
 import edu.pitt.isp.sverchkov.bn.BayesNet;
 import java.awt.Rectangle;
 import java.io.File;
