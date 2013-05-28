@@ -4,8 +4,8 @@
  */
 package edu.pitt.isp.sverchkov.bnvis;
 
-import edu.pitt.isp.sverchkov.bn.BNUtils;
 import edu.pitt.isp.sverchkov.bn.BayesNet;
+import edu.pitt.isp.sverchkov.graph.GraphTools;
 import edu.pitt.isp.sverchkov.smile.BayesNetSMILE;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -66,7 +66,7 @@ public class BNVisualization {
         Map<String,BNNodeSketch> nodeMap = new HashMap<>();
         
         // Make models and sketches
-        for( String name : BNUtils.nodesInTopOrder(net) ){
+        for( String name : GraphTools.nodesInTopOrder(net) ){
             BNNodeModel model = new BNNodeModelImpl( net, name );
             
             Float x=0f, y=0f;
