@@ -5,6 +5,7 @@
 package edu.pitt.isp.sverchkov.bnvis;
 
 import edu.pitt.isp.sverchkov.bn.BayesNet;
+import edu.pitt.isp.sverchkov.combinatorics.Assignments;
 import edu.pitt.isp.sverchkov.graph.GraphTools;
 import edu.pitt.isp.sverchkov.smile.BayesNetSMILE;
 import java.awt.BorderLayout;
@@ -60,6 +61,11 @@ public class BNVisualization {
 
             @Override
             public Map<List<String>, Double> probabilities(List<? extends String> nodes, Map<? extends String, ? extends String> conditions) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public Assignments<String, String> parentAssignments(String node) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
