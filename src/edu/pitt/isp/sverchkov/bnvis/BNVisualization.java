@@ -57,6 +57,11 @@ public class BNVisualization {
             public Iterator<String> iterator() {
                 return Arrays.asList("A","B","C").iterator();
             }
+
+            @Override
+            public Map<List<String>, Double> probabilities(List<? extends String> nodes, Map<? extends String, ? extends String> conditions) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
         };
     }
 

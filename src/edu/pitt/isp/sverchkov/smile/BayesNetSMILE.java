@@ -169,4 +169,9 @@ public class BayesNetSMILE implements BayesNet<String,String> {
         return result.toString();
     }
 
+    @Override
+    public Map<List<String>, Double> probabilities(List<? extends String> nodes, Map<? extends String, ? extends String> conditions) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }
